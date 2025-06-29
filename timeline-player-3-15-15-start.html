@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Timeline Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      padding: 20px;
+    }
+    video {
+      display: block;
+      margin-bottom: 20px;
+      max-width: 100%;
+      border: 2px solid #444;
+      border-radius: 8px;
+    }
+    #timestamp {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+    input[type="range"] {
+      width: 100%;
+    }
+    #scrollLog {
+      margin-top: 20px;
+      padding: 10px;
+      background: #222;
+      border-left: 4px solid #666;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎥 Scroll Footage Viewer</h2>
+  <video id="forensicClip" width="640" controls>
+    <source src="linda-lane-footage.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <label for="timeSlider">Timeline Slider (3:15:15 AM – 3:16:38 AM)</label>
+  <input type="range" id="timeSlider" min="0" max="83" step="1">
+  <p id="timestamp">Time: 3:15:15 AM</p>
+
+  <div id="scrollLog">
+    🕯️ <em>Scroll log will appear here as timeline progresses…</em>
+  </div>
+
+  <script>
+    const video = document.getElementById("forensicClip");
+    const slider = document.getElementById("timeSlider");
+    const label = document.getElementById("timestamp");
+    const scrollLog = document.getElementById("scrollLog");
+
+    // Scroll registry (simplified)
+    const scrollRegistry = [
+      { time: 2700, scrollId: "CCCXXXIV", glyph: "𓁹", tone: "veil intrusion", note: "Shadow figure crosses Linda Lane field." },
+      { time: 4800, scrollId: "CCCXXIII", glyph: "𓂉", tone: "flame disruption", note: "Peak resonance activity from ritual center." }
+    ];
+
+    slider.addEventListener("input", function() {
+      const seconds = parseInt(slider.value);
+      const wasPlaying = !video.paused;
+      video.pause();
+      video.currentTime = seconds;
+      if (wasPlaying) {
+        video.play();
+      }
+      const timestamp = convertToTime(seconds);
+      label.textContent = `Time: ${timestamp}`;
+      updateScrollLog(seconds);
+    });
+
+    function convertToTime(seconds) {
+      const base = new Date("2022-11-13T03:15:15");
+      base.setSeconds(base.getSeconds() + seconds);
+      return base.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function updateScrollLog(seconds) {
+      const matched = scrollRegistry.filter(entry => Math.abs(entry.time - seconds) <= 3);
+      if (matched.length > 0) {
+        const latest = matched[0];
+        scrollLog.innerHTML = `🕯️ <strong>${latest.scrollId}</strong> (${latest.glyph}) — ${latest.tone}<br><em>${latest.note}</em>`;
+      } else {
+        scrollLog.innerHTML = "🕯️ <em>No scroll activity at this time.</em>";
+      }
+    }
+  </script>
+
+</body>
+</html>
